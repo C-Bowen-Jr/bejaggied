@@ -461,7 +461,7 @@ class Score:
 class Timer:
     def __init__(self):
         self.currentTime = pygame.time.get_ticks() / 1000
-        self.timeLimit = self.currentTime + 60
+        self.timeLimit = 0
         self.font = pygame.font.Font(None, 32)
 
         #self.image = pygame.image.load(os.path.join('images', 'timebar.png'))
@@ -471,6 +471,9 @@ class Timer:
     def tick(self):
         time = pygame.time.get_ticks() / 1000
         self.currentTime = int(time)
+    
+    def setTimeLimit(self, seconds):
+        self.timeLimit = self.currentTime + 60
 
     def gameEnd(self):
         if self.currentTime >= self.timeLimit:
@@ -545,11 +548,15 @@ def runBejeweled():
     score = Score(0)
     timer = Timer()
 
-    gameEnd = False
+    gamePhase = 'menu'
+    gameMode = 'none'
 
     #Text for the gameOver screen
     gameOverText = Text(64, "Game Over", (100,100))
     newGameText = Text(50, "Start New Game?", (100, 300))
+    titleText = Text(90, "Bejaggied", (80, 20))
+    timedGameText = Text(50, "Start a timed game", (200, 300))
+    scoredGameText = Text(50, "Start a scored game", (200, 400))
     quitText = Text(50, "Quit", (440, 300))
     scoreText = Text(50, "Your Score is: %d" % score.score, (300, 250))
 
@@ -568,7 +575,16 @@ def runBejeweled():
                 sys.exit()
 
             elif event.type == MOUSEBUTTONDOWN:
-                if gameEnd == False:
+                if gamePhase == 'menu':
+                    if timedGameText.rect.collidepoint(event.pos):
+                        gamePhase = 'play'
+                        gameMode = 'timed.bejewel'
+                        timer.setTimeLimit(60)
+                    elif scoredGameText.rect.collidepoint(event.pos):
+                        gamePhase = 'play'
+                        gameMode = 'scored.bejewel'
+                        
+                elif gamePhase == 'play':
                     if gameBoard.state == 'standby':
                         if pick1 == None:
                             pick1 = gameBoard.checkMouseClick(event.pos)
@@ -582,18 +598,18 @@ def runBejeweled():
                 else:
                     if newGameText.rect.collidepoint(event.pos):
                         #runGame() #Re-start whole game all over again
-                        gameEnd = False
+                        gamePhase = 'play'
                         gameBoard.state = "starting"
                         gameBoard.setBoard()
                         score  = Score(0)
-                        timer = Timer()
+                        timer.setTimeLimit(60)
 
                     elif quitText.rect.collidepoint(event.pos):
                         pygame.quit()
                         sys.exit()
                         
             elif event.type == MOUSEMOTION:
-                if gameEnd == True:
+                if gamePhase == 'game over':
                     if quitText.rect.collidepoint(event.pos):
                         quitText.changeColor((200,25,25))
 
@@ -605,19 +621,29 @@ def runBejeweled():
 
                     else:
                         newGameText.changeColor((0,0,0))
+                elif gamePhase == 'menu':
+                    if timedGameText.rect.collidepoint(event.pos):
+                        timedGameText.changeColor((200,25,25))
+                    else:
+                        timedGameText.changeColor((0,0,0))
+
+                    if scoredGameText.rect.collidepoint(event.pos):
+                        scoredGameText.changeColor((200,25,25))
+                    else:
+                        scoredGameText.changeColor((0,0,0))
                         
 
 
         #Update Phase
         clock.tick(120)
-
         timer.tick()
+        
         #Game On
-        if gameEnd == False:
+        if gamePhase == 'play':
             #Check if time is up
             if timer.gameEnd() == True:
                 #Game is over, get final score
-                gameEnd = True
+                gamePhase = 'game over'
                 scoreText.changeMessage("Score: %d" % score.score)
 
             #If a comment is showing, update its state, after a set time, it should dissappear 
@@ -686,9 +712,17 @@ def runBejeweled():
             
 
         #Draw to Screen Phase
-        if gameEnd == False:
+        if gamePhase == "menu":
             screen.fill(BG_COLOR)
             
+            titleText.draw(screen)
+            timedGameText.draw(screen)
+            scoredGameText.draw(screen)
+
+            pygame.display.update()
+
+        elif gamePhase == "play":
+            screen.fill(BG_COLOR)
                 
             gameBoard.draw()
             score.draw(screen, (340,20))
@@ -700,7 +734,7 @@ def runBejeweled():
 
             pygame.display.update()
 
-        else:
+        elif gamePhase == "game over":
             screen.fill(BG_COLOR)
             
             gameOverText.draw(screen)

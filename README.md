@@ -5,6 +5,10 @@ Bejaggied is fan made MonHun themed Bejeweled clone. A fun use of your 60 second
 ## Roadmap
 - [x] Reskin with Monster Hunter graphics
 - [ ] Flesh out base engine from original fork
+  - [x] Fix timeout game ending logic
+  - [x] Fix game reset logic
+  - [ ] Changes to allow multiple game modes
+  - [ ] Scoreboard
 - [ ] Add alternate game modes (ie jewel shuffle and others)
 
 ### Credit
