@@ -22,6 +22,25 @@ FOUR_IN_A_ROW = 200
 FIVE_IN_A_ROW = 250
 BONUS = 500
 
+def blitRotate(surf, image, pos, originPos, angle):
+
+    # offset from pivot to center
+    image_rect = image.get_rect(topleft = (pos[0] - originPos[0], pos[1]-originPos[1]))
+    offset_center_to_pivot = pygame.math.Vector2(pos) - image_rect.center
+    
+    # roatated offset from pivot to center
+    rotated_offset = offset_center_to_pivot.rotate(-angle)
+
+    # roatetd image center
+    rotated_image_center = (pos[0] - rotated_offset.x, pos[1] - rotated_offset.y)
+
+    # get a rotated image
+    rotated_image = pygame.transform.rotate(image, angle)
+    rotated_image_rect = rotated_image.get_rect(center = rotated_image_center)
+
+    # rotate and blit the image
+    surf.blit(rotated_image, rotated_image_rect)
+
 class GameBoard:
     def __init__(self):
         self.screen = pygame.display.get_surface()
@@ -30,6 +49,7 @@ class GameBoard:
         self.columns = NUM_OF_COLUMNS
 
         self.background = pygame.image.load(os.path.join("images",'board.png'))
+        self.arrow = pygame.image.load(os.path.join("images","arrow.png"))
         self.grid = pygame.Surface((512,512), pygame.SRCALPHA)
         #Draw the grid for the board
         for x in range(0,SPACE_SIZE*(NUM_OF_COLUMNS+1), SPACE_SIZE):
@@ -475,6 +495,12 @@ class Timer:
     def setTimeLimit(self, seconds):
         self.timeLimit = self.currentTime + 60
 
+    def getTimeLeftRotation(self):
+        timeLeft = self.timeLimit - self.currentTime
+        rotation = 300 * (timeLeft / 60)
+        rotation -= 300
+        return int(rotation)
+
     def gameEnd(self):
         if self.currentTime >= self.timeLimit:
             return True
@@ -725,6 +751,9 @@ def runBejeweled():
             screen.fill(BG_COLOR)
                 
             gameBoard.draw()
+
+            #blitRotate(screen, gameBoard.arrow, (72,7),(7,40), timer.getTimeLeftRotation())
+            blitRotate(screen, gameBoard.arrow,(82,47),(7,40),timer.getTimeLeftRotation())
             score.draw(screen, (340,20))
             timer.draw(screen, (4, 120))
             if pick1 != None:
