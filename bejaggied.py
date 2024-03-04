@@ -30,7 +30,7 @@ class GameBoard:
         self.columns = NUM_OF_COLUMNS
 
         self.background = pygame.image.load(os.path.join("images",'board.png'))
-        self.grid = pygame.Surface((512,512))
+        self.grid = pygame.Surface((512,512), pygame.SRCALPHA)
         #Draw the grid for the board
         for x in range(0,SPACE_SIZE*(NUM_OF_COLUMNS+1), SPACE_SIZE):
             pygame.draw.line(self.grid, GRID_COLOR, (x, 0), (x,SPACE_SIZE*NUM_OF_ROWS))
@@ -405,7 +405,7 @@ class GameBoard:
             for cell in row:
                 cell.draw(self.screen)
 
-        #self.screen.blit(self.grid, pygame.Rect(144,60,512,512))
+        self.screen.blit(self.grid, pygame.Rect(144,60,512,512))
 
 
 class Cell:
@@ -714,7 +714,7 @@ def runBejeweled():
         #Draw to Screen Phase
         if gamePhase == "menu":
             screen.fill(BG_COLOR)
-            
+
             titleText.draw(screen)
             timedGameText.draw(screen)
             scoredGameText.draw(screen)
