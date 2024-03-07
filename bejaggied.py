@@ -9,8 +9,8 @@ SPACE_SIZE = 64 #Size of gem images
 HIGHLIGHT_COLOR = (238, 130, 238) #Highlight border color of a chosen gem
 EMPTY_SPACE = -1 #Used to denote an empty space on board
 STARTING_Y  = 460 #How much up does the board originally start falling from?
-FALL_SPEED = 4
-MOVE_SPEED = 3
+FALL_SPEED = 6
+MOVE_SPEED = 6
 SCREEN_SIZE = (800,600)
 BG_COLOR = (190,190,190)
 GRID_COLOR = (0,0,0)
@@ -604,11 +604,11 @@ def runBejeweled():
                 if gamePhase == 'menu':
                     if timedGameText.rect.collidepoint(event.pos):
                         gamePhase = 'play'
-                        gameMode = 'timed.bejewel'
+                        gameMode = 'timed.bejeweled'
                         timer.setTimeLimit(60)
                     elif scoredGameText.rect.collidepoint(event.pos):
                         gamePhase = 'play'
-                        gameMode = 'scored.bejewel'
+                        gameMode = 'scored.bejeweled'
                         
                 elif gamePhase == 'play':
                     if gameBoard.state == 'standby':
@@ -667,10 +667,15 @@ def runBejeweled():
         #Game On
         if gamePhase == 'play':
             #Check if time is up
-            if timer.gameEnd() == True:
+            if timer.gameEnd() == True and gameMode == 'timed.bejeweled':
                 #Game is over, get final score
                 gamePhase = 'game over'
-                scoreText.changeMessage("Score: %d" % score.score)
+                scoreText.changeMessage("fScore: {score.score}")
+
+            elif score.score > 10000 and gameMode == 'scored.bejeweled':
+                #Game is over, get final time
+                gamePhase = 'game over'
+                scoreText.changeMessage(f"Finished in 0 minutes 0 seconds:todo")
 
             #If a comment is showing, update its state, after a set time, it should dissappear 
             for comment in comments:
