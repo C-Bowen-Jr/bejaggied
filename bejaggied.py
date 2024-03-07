@@ -670,7 +670,7 @@ def runBejeweled():
             if timer.gameEnd() == True and gameMode == 'timed.bejeweled':
                 #Game is over, get final score
                 gamePhase = 'game over'
-                scoreText.changeMessage("fScore: {score.score}")
+                scoreText.changeMessage(f"Score: {score.score}")
 
             elif score.score > 10000 and gameMode == 'scored.bejeweled':
                 #Game is over, get final time
@@ -756,11 +756,13 @@ def runBejeweled():
             screen.fill(BG_COLOR)
                 
             gameBoard.draw()
-
-            #blitRotate(screen, gameBoard.arrow, (72,7),(7,40), timer.getTimeLeftRotation())
-            blitRotate(screen, gameBoard.arrow,(82,47),(7,40),timer.getTimeLeftRotation())
-            score.draw(screen, (340,20))
-            timer.draw(screen, (4, 120))
+            
+            if gameMode == 'timed.bejeweled':
+                blitRotate(screen, gameBoard.arrow,(82,47),(7,40),timer.getTimeLeftRotation())
+                score.draw(screen, (340,20))
+                timer.draw(screen, (4, 120))
+            elif gameMode == 'scored.bejeweled':
+                score.draw(screen, (340, 20))
             if pick1 != None:
                 gameBoard.board[pick1[0]][pick1[1]].highlight(screen) #Highlight the first chosen gem
             for comment in comments: #Draw any comments
