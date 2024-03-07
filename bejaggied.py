@@ -473,6 +473,7 @@ class Score:
     def __init__(self, startingScore):
         self.score = startingScore
         self.font = pygame.font.SysFont("Arial", 32)
+        self.moves = 0
 
     def draw(self, screen, pos):
         score = self.font.render("Score: %d" % self.score, 1, (0,0,0))
@@ -579,12 +580,13 @@ def runBejeweled():
 
     #Text for the gameOver screen
     gameOverText = Text(64, "Game Over", (100,100))
-    newGameText = Text(50, "Start New Game?", (100, 300))
+    newGameText = Text(50, "Start New Game?", (100, 400))
     titleText = Text(90, "Bejaggied", (80, 20))
     timedGameText = Text(50, "Start a timed game", (200, 300))
     scoredGameText = Text(50, "Start a scored game", (200, 400))
-    quitText = Text(50, "Quit", (440, 300))
+    quitText = Text(50, "Quit", (440, 400))
     scoreText = Text(50, "Your Score is: %d" % score.score, (300, 250))
+    movesText = Text(50, "Moves: %d" % score.moves, (300,300))
 
     #Text for comments
     goodText = Text(64, "Good!", color=(255,0,0))
@@ -671,11 +673,13 @@ def runBejeweled():
                 #Game is over, get final score
                 gamePhase = 'game over'
                 scoreText.changeMessage(f"Score: {score.score}")
+                movesText.changeMessage(f"Moves: {score.moves}")
 
             elif score.score > 10000 and gameMode == 'scored.bejeweled':
                 #Game is over, get final time
                 gamePhase = 'game over'
-                scoreText.changeMessage(f"Finished in 0 minutes 0 seconds:todo")
+                scoreText.changeMessage(f"Time: 0 minutes 0 seconds:todo")
+                movesText.changeMessage(f"Moves: {score.moves}")
 
             #If a comment is showing, update its state, after a set time, it should dissappear 
             for comment in comments:
@@ -704,6 +708,7 @@ def runBejeweled():
                     gameBoard.swapGems(pick1, pick2)
                     pick1, pick2 = None, None
                     gameBoard.state = 'removeMatches'
+                    score.moves += 1
 
             elif gameBoard.state == 'removeMatches':
                 removed =  gameBoard.removeMatches() #i.e. there were matches, and all matches were removed
@@ -777,6 +782,7 @@ def runBejeweled():
             newGameText.draw(screen)
             quitText.draw(screen)
             scoreText.draw(screen)
+            movesText.draw(screen)
 
             pygame.display.update()
 
