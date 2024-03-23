@@ -310,9 +310,61 @@ class GameBoard:
 
                         matches.append(match)
                         skip.extend(matches)
-                    
         return matches
-                    
+
+    def withinBounds(self, row, column):
+        return 0 <= row < self.rows and 0 <= column < self.columns
+
+    def noValidMoves(self):
+        for row in range(self.rows):
+            for column in range(self.columns):
+                check = self.board[row][column].image
+
+                #Horizontal Checking
+                # 1|1|0 Pattern
+                if self.withinBounds(row,column+1) and self.board[row][column+1].image == check:
+                    #Check up, then right, then down
+                    if self.withinBounds(row-1,column+2) and self.board[row-1][column+2].image == check:
+                        return False
+                    elif self.withinBounds(row,column+3) and self.board[row][column+3].image == check:
+                        return False
+                    elif self.withinBounds(row+1,column+2) and self.board[row+1][column+2].image == check:
+                        return False
+                # 1|0|? Pattern
+                elif self.withinBounds(row-1,column+1) and self.board[row-1][column+1].image == check:
+                    if self.withinBounds(row-1,column+2) and self.board[row-1][column+2].image == check:
+                        return False
+                    elif self.withinBounds(row,column+2) and self.board[row][column+2].image == check:
+                        return False
+                elif self.withinBounds(row+1,column+1) and self.board[row+1][column+1].image == check:
+                    if self.withinBounds(row+1,column+2) and self.board[row+1][column+2].image == check:
+                        return False
+                    elif self.withinBounds(row,column+2) and self.board[row][column+2].image == check:
+                        return False
+
+                #Vertical Checking
+                # 1|1|0 Pattern
+                elif self.withinBounds(row+1,column) and self.board[row+1][column].image == check:
+                    #Check left, then down, then right
+                    if self.withinBounds(row+2,column-1) and self.board[row+2][column-1].image == check:
+                        return False
+                    elif self.withinBounds(row+3,column) and self.board[row+3][column].image == check:
+                        return False
+                    elif self.withinBounds(row+2,column+1) and self.board[row+2][column+1].image == check:
+                        return False
+                # 1|0|? Pattern
+                elif self.withinBounds(row+1,column-1) and self.board[row+1][column-1].image == check:
+                    if self.withinBounds(row+2,column-1) and self.board[row+2][column-1].image == check:
+                        return False
+                    elif self.withinBounds(row+2,column) and self.board[row+2][column].image == check:
+                        return False
+                elif self.withinBounds(row+1,column+1) and self.board[row+1][column+1].image == check:
+                    if self.withinBounds(row+2,column+1) and self.board[row+2][column+1].image == check:
+                        return False
+                    elif self.withinBounds(row+2,column) and self.board[row+2][column].image == check:
+                        return False
+
+        return True
     
     def removeMatches(self):
         matches = self.checkForMatches()
@@ -732,9 +784,16 @@ def runBejeweled():
                     #Then animate removing. At the end of animation any cell with cell.cleared value to True will
                     #Have it's image set to EMPTY_SPACE
 
-                elif removed == 0: #There were no matches, return to standby
-                    gameBoard.state = 'standby'
+                elif removed == 0: #There were no matches, check that we have another move on board
+                    gameBoard.state = 'checkMoveless'
                     lastScore = None
+
+            elif gameBoard.state == 'checkMoveless':
+                if gameBoard.noValidMoves():
+                    print("No moves left, early game over")
+                    gamePhase = 'game over'
+                else:
+                    gameBoard.state = 'standby' # Ok to move to standby
 
             elif gameBoard.state == 'pullDown':
                 if gameBoard.animatePullDown(dropSlots) == 1:
